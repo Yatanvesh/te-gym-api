@@ -53,7 +53,7 @@ async function list(opts = {}) {
   const {
     offset = 0, limit = 25
   } = opts
-  const trainers = await Trainer.find()
+  const trainers = await Trainer.find({},{password:0, _id:0, __v:0})
     .sort({
       _id: 1
     })
