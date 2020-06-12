@@ -5,6 +5,8 @@ var cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const multer = require('multer');
+const upload = multer();
 
 const indexRouter = require('./routes/index');
 const registerRouter = require('./routes/register');
@@ -22,6 +24,7 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// app.use(upload.array('file'));
 app.use(cookieParser());
 // app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'public')));

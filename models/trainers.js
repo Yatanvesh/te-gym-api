@@ -1,12 +1,8 @@
 const cuid = require('cuid');
-const bcrypt = require('bcrypt');
-const {
-  isEmail,
-} = require('validator');
+const {emailSchema,hashPassword} = require('./utility');
 
 const db = require('../db');
 
-const SALT_ROUNDS = 10;
 
 const Trainer = db.model('Trainer', {
   _id: {
@@ -20,36 +16,30 @@ const Trainer = db.model('Trainer', {
   },
   email: emailSchema({
     required: true
-  })
+  }),
+  firstName:{
+    type:String,
+    required: true
+  },
+  lastName:{
+    type:String
+  },
+  phone:{
+    type:String
+  },
+  displayPicture:{
+    type:String
+  },
+  bmi:{
+    type:Number
+  },
+  weight:{
+    type:Number
+  },
+  cost:{
+    type:Number
+  },
 })
-
-function emailSchema(opts = {}) {
-  const {
-    required
-  } = opts
-  return {
-    type: String,
-    required: !!required,
-    unique:true,
-    lowercase:true,
-    validate: [{
-      validator: isEmail,
-      message: props => `${props.value} is not a valid email address`
-    },
-      {
-        validator: function (email) {
-          return isUnique(this, email)
-        },
-        message: props => 'Email already in use'
-      }
-    ]
-  }
-}
-
-async function isUnique(doc, email) {
-  const existing = await get(email)
-  return !existing || doc._id === existing._id
-}
 
 async function get(email) {
   const trainer = await Trainer.findOne({
@@ -94,11 +84,7 @@ async function edit(email, change) {
   return trainer;
 }
 
-async function hashPassword(trainer) {
-  if (!trainer.password) throw trainer.invalidate('password', 'password is required')
-  if (trainer.password.length < 5) throw trainer.invalidate('password', 'password must be at least 5 characters')
-  trainer.password = await bcrypt.hash(trainer.password, SALT_ROUNDS)
-}
+
 
 module.exports = {
   get,
