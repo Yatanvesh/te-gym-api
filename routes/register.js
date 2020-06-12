@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 var multer  = require('multer');
 
+const Trainers = require('../models/trainers');
+const Customers = require('../models/customers');
+
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, './public/images');
@@ -22,8 +25,6 @@ var storage = multer.diskStorage({
   }
 });
 const upload = multer({storage: storage});
-const fileUploader = upload.single('file');
-const Trainers = require('../models/trainers');
 
 router.post('/trainer',upload.single('file'), async function (req, res, next) {
   try {
@@ -48,8 +49,27 @@ router.post('/trainer',upload.single('file'), async function (req, res, next) {
   }
 });
 
-router.post('/customer', function (req, res, next) {
-  res.send('customer');
-});
 
+router.post('/customer',upload.single('file'), async function (req, res, next) {
+  try {
+    const filename = req.file && req.file.filename;
+    console.log(req.body, filename)
+
+    const customer = await Customers.create({
+      ...req.body,
+      displayPicture:filename
+    });
+    const {
+      email
+    } = customer;
+    res.json({
+      email,
+      success:true
+    });
+  } catch (err) {
+    res.status(500).json({
+      err: err.message
+    });
+  }
+});
 module.exports = router;

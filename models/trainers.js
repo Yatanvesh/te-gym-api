@@ -1,6 +1,7 @@
 const cuid = require('cuid');
-const {emailSchema,hashPassword} = require('./utility');
+const {isEmail} = require('validator');
 
+const {hashPassword} = require('./utility');
 const db = require('../db');
 
 
@@ -85,6 +86,33 @@ async function edit(email, change) {
 }
 
 
+function emailSchema(opts = {}) {
+  const {
+    required
+  } = opts
+  return {
+    type: String,
+    required: !!required,
+    unique: true,
+    lowercase: true,
+    validate: [{
+      validator: isEmail,
+      message: props => `${props.value} is not a valid email address`
+    },
+      {
+        validator: function (email) {
+          return isUnique(this, email)
+        },
+        message: props => 'Email already in use'
+      }
+    ]
+  }
+}
+
+async function isUnique(doc, property) {
+  const existing = await get(property);
+  return !existing || doc._id === existing._id;
+}
 
 module.exports = {
   get,
