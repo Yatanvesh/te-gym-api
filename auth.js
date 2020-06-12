@@ -31,16 +31,21 @@ const authenticate = passport.authenticate('local', {
 });
 
 async function ensureUser(req, res, next) {
-  const jwtString = req.headers.authorization;
-  const payload = await verify(jwtString);
-  if (payload.username) {
-    req.user = payload;
-    return next()
-  }
+  try {
+    const jwtString = req.headers.authorization;
+    const payload = await verify(jwtString);
+    if (payload) {
+      req.user = payload;
+      return next()
+    }
 
-  const err = new Error('Unauthorized')
-  err.statusCode = 401
-  next(err)
+    const err = new Error('Unauthorized')
+    err.statusCode = 401
+    next(err)
+  } catch (err) {
+    err.statusCode = 401
+    next(err)
+  }
 }
 
 function adminStrategy() {
@@ -69,8 +74,9 @@ async function sign(payload) {
 async function verify(jwtString = '') {
   jwtString = jwtString.replace(/^Bearer /i, '')
   try {
-    const payload = await jwt.verify(jwtString, jwtSecret)
-    return payload
+    const payload = await jwt.verify(jwtString, jwtSecret);
+    console.log(payload)
+    return payload;
   } catch (err) {
     err.statusCode = 401
     throw err

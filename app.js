@@ -10,6 +10,7 @@ const upload = multer();
 
 const indexRouter = require('./routes/index');
 const registerRouter = require('./routes/register');
+const trainerRouter = require('./routes/trainers');
 const middleware = require('./middleware');
 const auth = require('./auth');
 // var usersRouter = require('./routes/users');
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/register', registerRouter);
 app.post('/login', auth.authenticate, auth.login);
+app.use('/trainers', auth.ensureUser,trainerRouter);
 
 // app.use('/users', usersRouter);
 
