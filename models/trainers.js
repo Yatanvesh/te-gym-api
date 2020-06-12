@@ -18,26 +18,38 @@ const Trainer = db.model('Trainer', {
   email: emailSchema({
     required: true
   }),
-  firstName:{
-    type:String,
+  name: {
+    type: String,
     required: true
   },
-  lastName:{
-    type:String
-  },
-  phone:{
-    type:String
-  },
-  displayPicture:{
-    type:String
-  },
-  bmi:{
+  experience:{
     type:Number
   },
-  weight:{
+  chargePerHour:{
     type:Number
   },
-  cost:{
+  phone: {
+    type: String
+  },
+  gender:{
+    type:String
+  },
+  displayPicture: {
+    type: String
+  },
+  bmi: {
+    type: Number
+  },
+  weight: {
+    type: Number
+  },
+  height:{
+    type:Number
+  },
+  chest: {
+    type: Number
+  },
+  biceps:{
     type:Number
   },
 })
@@ -53,7 +65,7 @@ async function list(opts = {}) {
   const {
     offset = 0, limit = 25
   } = opts
-  const trainers = await Trainer.find({},{password:0, _id:0, __v:0})
+  const trainers = await Trainer.find({}, {password: 0, _id: 0, __v: 0})
     .sort({
       _id: 1
     })

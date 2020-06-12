@@ -17,12 +17,9 @@ const Customer = db.model('Customer', {
   email: emailSchema({
     required: true
   }),
-  firstName:{
+  name:{
     type:String,
     required: true
-  },
-  lastName:{
-    type:String
   },
   phone:{
     type:String
@@ -30,17 +27,8 @@ const Customer = db.model('Customer', {
   displayPicture:{
     type:String
   },
-  bmi:{
-    type:Number
-  },
-  weight:{
-    type:Number
-  },
-  targetWeight:{
-    type:Number
-  },
-  height:{
-    type:Number
+  gender:{
+    type:String
   }
 })
 
