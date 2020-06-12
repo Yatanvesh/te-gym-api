@@ -8,6 +8,20 @@ function handleError(err, req, res, next) {
   res.render('error');
 }
 
+// catch errors, no need to write try catch everywhere
+const autoCatch = function (fn) {
+  return function () {
+    try {
+      return fn.apply(this, arguments);
+    } catch (ex) {
+      res.status(500).json({
+        err: err.message
+      });
+    }
+  };
+};
+
 module.exports = {
-  handleError
+  handleError,
+  autoCatch
 }
