@@ -17,7 +17,6 @@ router.post('/trainer', async function (req, res, next) {
       err: err.message
     });
   }
-
 });
 
 router.post('/customer', function (req, res, next) {

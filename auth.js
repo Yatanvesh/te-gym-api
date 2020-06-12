@@ -2,11 +2,11 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport')
 const Strategy = require('passport-local').Strategy
 // const expressSession = require('express-session')
-const Users = require('./models/customers');
+const Trainers = require('./models/trainers');
 const bcrypt = require('bcrypt');
 
 const jwtSecret = process.env.JWT_SECRET || 'mark it zero'
-// const sessionSecret = process.env.SESSION_SECRET || 'lmao'
+// const sessionSecret = process.env.SESSION_SECRET || 'random string of words'
 const adminPassword = process.env.ADMIN_PASSWORD || 'iamthewalrus'
 const jwtOpts = {
   algorithm: 'HS256',
@@ -15,13 +15,9 @@ const jwtOpts = {
 
 passport.use(adminStrategy());
 
-
 const login = async (req, res) => {
   const token = await sign({
-    username: req.user.username
-  });
-  res.cookie('jwt', token, {
-    httpOnly: true
+    username: req.username
   });
   res.json({
     success: true,
@@ -34,11 +30,10 @@ const authenticate = passport.authenticate('local', {
 });
 
 async function ensureUser(req, res, next) {
-  const jwtString = req.headers.authorization || req.cookies.jwt;
+  const jwtString = req.headers.authorization;
   const payload = await verify(jwtString);
   if (payload.username) {
-    req.user = payload
-    if (req.user.username === 'admin') req.isAdmin = true
+    req.user = payload;
     return next()
   }
 
@@ -49,14 +44,10 @@ async function ensureUser(req, res, next) {
 
 function adminStrategy() {
   return new Strategy(async function (username, password, cb) {
-    const isAdmin = username === 'admin' && password === adminPassword
-    if (isAdmin) return cb(null, {
-      username: 'admin'
-    })
     try {
-      const user = await Users.get(username)
-      if (!user) return cb(null, false)
-      const isUser = await bcrypt.compare(password, user.password)
+      const user = await Trainers.get(username);
+      if (!user) return cb(null, false);
+      const isUser = await bcrypt.compare(password, user.password);
       if (isUser) return cb(null, {
         username: user.username
       })
@@ -66,8 +57,8 @@ function adminStrategy() {
 }
 
 async function sign(payload) {
-  const token = await jwt.sign(payload, jwtSecret, jwtOpts)
-  return token
+  const token = await jwt.sign(payload, jwtSecret, jwtOpts);
+  return token;
 }
 
 async function verify(jwtString = '') {
