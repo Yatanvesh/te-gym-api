@@ -17,7 +17,7 @@ const Model = db.model('User', {
   email: emailSchema({
     required: true
   }),
-  userData: {type: String, ref: 'UserData', index: true},
+  userData: {type: String, ref: 'UserData', index: true}, // maybe reqd, maybe not. Lets keep this here for now
   userType: {type: String, default: 'USER', enum: ['USER', 'COACH'], required:true}
 })
 

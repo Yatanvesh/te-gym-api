@@ -3,7 +3,6 @@ const {isEmail} = require('validator');
 
 const db = require('../config/db');
 
-``
 const Model = db.model('UserData', {
   _id: {
     type: String,

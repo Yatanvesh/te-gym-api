@@ -30,6 +30,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.get('/testAuthorization', auth.checkJWTValidity);
 app.use('/register', registerRouter);
 app.post('/login', auth.authenticate, auth.login);
 app.use('/trainers', auth.ensureUser, trainerRouter);

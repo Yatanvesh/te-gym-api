@@ -47,16 +47,30 @@ async function ensureUser(req, res, next) {
   }
 }
 
+async function checkJWTValidity(req, res, next) {
+  try {
+    const jwtString = req.headers.authorization;
+    const payload = await verify(jwtString);
+    if (payload) {
+      res.json({valid: true});
+    } else
+      throw new Error('invalid jwt');
+  } catch (err) {
+    res.status(401).json({valid: false});
+  }
+}
+
 function adminStrategy() {
   return new Strategy(async function (username, password, cb) {
     try {
       let user = await Users.get(username);
-      if(!user)return cb(null, false);
+      if (!user) return cb(null, false);
       const isUser = await bcrypt.compare(password, user.password);
       if (isUser) return cb(null, {
         username: user.username
       })
-    } catch (err) {}
+    } catch (err) {
+    }
     cb(null, false)
   })
 }
@@ -81,5 +95,6 @@ async function verify(jwtString = '') {
 module.exports = {
   authenticate,
   login,
-  ensureUser
+  ensureUser,
+  checkJWTValidity
 }
