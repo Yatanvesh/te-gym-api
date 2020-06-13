@@ -34,7 +34,7 @@ const Trainer = db.model('Trainer', {
   gender:{
     type:String
   },
-  displayPicture: {
+  displayPictureUrl: {
     type: String
   },
   bmi: {

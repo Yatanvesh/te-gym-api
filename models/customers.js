@@ -24,7 +24,7 @@ const Customer = db.model('Customer', {
   phone:{
     type:String
   },
-  displayPicture:{
+  displayPictureUrl:{
     type:String
   },
   gender:{
