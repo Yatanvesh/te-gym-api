@@ -6,13 +6,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 // const multer = require('multer');
-var cloudinary = require('cloudinary').v2;
 
-cloudinary.config({
-  cloud_name: 'matrim',
-  api_key: '183547949416228',
-  api_secret: 'XIdpSQr52PYMmkBR-lSbBVec20o'
-});
 // const upload = multer();
 
 const indexRouter = require('./routes/index');

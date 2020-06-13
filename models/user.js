@@ -1,10 +1,11 @@
 const cuid = require('cuid');
 const {isEmail} = require('validator');
 
-const db = require('../db');
-const {hashPassword} = require('./utility');
+const {hashPassword} = require('../utility/utility');
+const db = require('../config/db');
 
-const Customer = db.model('Customer', {
+
+const Model = db.model('User', {
   _id: {
     type: String,
     default: cuid
@@ -17,63 +18,52 @@ const Customer = db.model('Customer', {
   email: emailSchema({
     required: true
   }),
-  name:{
-    type:String,
-    required: true
-  },
-  phone:{
-    type:String
-  },
-  displayPictureUrl:{
-    type:String
-  },
-  gender:{
-    type:String
-  }
+  userData: {type: String, ref: 'UserData', index: true, required: true},
+  userType: {type: String, default: 'USER', enum: ['USER', 'COACH']}
 })
 
-
 async function get(email) {
-  const customer = await Customer.findOne({
+  const model = await Model.findOne({
     email
   });
-  return customer;
+  return model;
 }
 
 async function list(opts = {}) {
   const {
-    offset = 0, limit = 25
+    offset = 0, limit = 25, userType = ''
   } = opts
-  const customers = await Customer.find()
+  const conditions = !!userType ? {userType}:{};
+  const model = await Model.find(conditions, {password: 0, _id: 0, __v: 0})
     .sort({
       _id: 1
     })
     .skip(offset)
     .limit(limit)
-  return customers;
+  return model;
 }
 
 async function remove(email) {
-  await Customer.deleteOne({
+  await Model.deleteOne({
     email
   })
 }
 
 async function create(fields) {
-  const customer = new Customer(fields)
-  await hashPassword(customer)
-  await customer.save()
-  return customer;
+  const model = new Model(fields)
+  await hashPassword(model)
+  await model.save()
+  return model;
 }
 
 async function edit(email, change) {
-  const customer = await get(email);
+  const model = await get(email);
   Object.keys(change).forEach(key => {
-    customer[key] = change[key]
+    model[key] = change[key]
   });
-  if (change.password) await hashPassword(customer);
-  await customer.save();
-  return customer;
+  if (change.password) await hashPassword(model);
+  await model.save();
+  return model;
 }
 
 function emailSchema(opts = {}) {
@@ -110,5 +100,5 @@ module.exports = {
   create,
   edit,
   remove,
-  model: Customer
+  model: Model
 }

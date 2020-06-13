@@ -1,54 +1,29 @@
 const express = require('express');
 const router = express.Router();
-var multer = require('multer');
-var cloudinary = require('cloudinary').v2;
-const fs = require('fs')
+const utility = require('../utility/utility');
+const {saveFileToServer} = require('../config/uploadConfig');
+const UserData = require('../models/userData');
+const User = require('../models/user');
 
-const Trainers = require('../models/trainers');
-const Customers = require('../models/customers');
-
-var storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, './uploads');
-  },
-  filename: (req, file, cb) => {
-    console.log(file);
-    var filetype = '';
-    if (file.mimetype === 'image/gif') {
-      filetype = 'gif';
-    }
-    if (file.mimetype === 'image/png') {
-      filetype = 'png';
-    }
-    if (file.mimetype === 'image/jpeg') {
-      filetype = 'jpg';
-    }
-    cb(null, 'image-' + Date.now() + '.' + filetype);
-  }
-});
-const upload = multer({storage: storage});
-
-const uploadLocalFile = async (path) => {
-  const res = await cloudinary.uploader.upload(path);
-  if (res && res.secure_url) {
-    console.log('file uploaded to Cloudinary', res.secure_url);
-  } else {
-    return '';
-  }
-  fs.unlinkSync(path);
-  return res.secure_url;
-}
-
-router.post('/trainer', upload.single('file'), async function (req, res, next) {
+router.post('/trainer', saveFileToServer.single('file'), async function (req, res, next) {
   try {
     let imageUrl = '';
     if (req.file && req.file.path) {
-      imageUrl = await uploadLocalFile(req.file.path);
+      imageUrl = await utility.uploadLocalFile(req.file.path);
     }
-    const trainer = await Trainers.create({
+    const trainer = await User.create({
+      ...req.body,
+    });
+    if (!(trainer && trainer.email))
+      throw new Error("User creation failed");
+
+    const trainerData = await UserData.create({
       ...req.body,
       displayPictureUrl: imageUrl
     });
+    if (!(trainerData && trainerData.email))
+      throw new Error("UserData creation failed");
+
     const {email} = trainer;
     res.json({email, success: true});
 
@@ -56,23 +31,34 @@ router.post('/trainer', upload.single('file'), async function (req, res, next) {
     // if(startTime && endTime){
     //
     // }
-  } catch (err) {
+  } catch
+    (err) {
     res.status(500).json({
       err: err.message
     });
   }
-});
+})
+;
 
-router.post('/user', upload.single('file'), async function (req, res, next) {
+router.post('/user', saveFileToServer.single('file'), async function (req, res, next) {
   try {
     let imageUrl = '';
     if (req.file && req.file.path) {
-      imageUrl = await uploadLocalFile(req.file.path);
+      imageUrl = await utility.uploadLocalFile(req.file.path);
     }
-    const customer = await Customers.create({
+    const customer = await User.create({
+      ...req.body,
+    });
+    if (!(customer && customer.email))
+      throw new Error("User creation failed");
+
+    const customerData = await UserData.create({
       ...req.body,
       displayPictureUrl: imageUrl
     });
+    if (!(customerData && customerData.email))
+      throw new Error("UserData creation failed");
+
     const {email} = customer;
     res.json({email, success: true});
   } catch (err) {

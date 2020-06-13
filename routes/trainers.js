@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-const Trainers = require('../models/trainers');
+const Users = require('../models/user');
 
 router.get('/', async function (req, res, next) {
-  let trainers = await Trainers.list();
+  let trainers = await Users.list({userType:'COACH'});
   res.json({trainers});
 });
 

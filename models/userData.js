@@ -1,19 +1,14 @@
 const cuid = require('cuid');
 const {isEmail} = require('validator');
 
-const {hashPassword} = require('./utility');
-const db = require('../db');
+const {hashPassword} = require('../utility/utility');
+const db = require('../config/db');
 
 
-const Trainer = db.model('Trainer', {
+const Model = db.model('UserData', {
   _id: {
     type: String,
     default: cuid
-  },
-  password: {
-    type: String,
-    maxLength: 120,
-    required: true
   },
   email: emailSchema({
     required: true
@@ -25,7 +20,7 @@ const Trainer = db.model('Trainer', {
   experience:{
     type:Number
   },
-  chargePerHour:{
+  chargePerSession:{
     type:Number
   },
   phone: {
@@ -55,46 +50,46 @@ const Trainer = db.model('Trainer', {
 })
 
 async function get(email) {
-  const trainer = await Trainer.findOne({
+  const model = await Model.findOne({
     email
   });
-  return trainer;
+  return model;
 }
 
 async function list(opts = {}) {
   const {
     offset = 0, limit = 25
   } = opts
-  const trainers = await Trainer.find({}, {password: 0, _id: 0, __v: 0})
+  const model = await Model.find({}, {password: 0, _id: 0, __v: 0})
     .sort({
       _id: 1
     })
     .skip(offset)
     .limit(limit)
-  return trainers;
+  return model;
 }
 
 async function remove(email) {
-  await Trainer.deleteOne({
+  await Model.deleteOne({
     email
   })
 }
 
 async function create(fields) {
-  const trainer = new Trainer(fields)
-  await hashPassword(trainer)
-  await trainer.save()
-  return trainer;
+  const model = new Model(fields)
+  await hashPassword(model)
+  await model.save()
+  return model;
 }
 
 async function edit(email, change) {
-  const trainer = await get(email);
+  const model = await get(email);
   Object.keys(change).forEach(key => {
-    trainer[key] = change[key]
+    model[key] = change[key]
   });
-  if (change.password) await hashPassword(trainer);
-  await trainer.save();
-  return trainer;
+  if (change.password) await hashPassword(model);
+  await model.save();
+  return model;
 }
 
 
@@ -132,5 +127,5 @@ module.exports = {
   create,
   edit,
   remove,
-  model: Trainer
+  model: Model
 }

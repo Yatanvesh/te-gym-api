@@ -2,8 +2,7 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport')
 const Strategy = require('passport-local').Strategy
 // const expressSession = require('express-session')
-const Trainers = require('./models/trainers');
-const Customers = require('./models/customers');
+const Users = require('./models/user');
 const bcrypt = require('bcrypt');
 
 const jwtSecret = process.env.JWT_SECRET || 'mark it zero'
@@ -51,11 +50,7 @@ async function ensureUser(req, res, next) {
 function adminStrategy() {
   return new Strategy(async function (username, password, cb) {
     try {
-      // First check in trainers, then customers
-      let user = await Trainers.get(username);
-      if (!user){
-        user = await Customers.get(username);
-      }
+      let user = await Users.get(username);
       if(!user)return cb(null, false);
       const isUser = await bcrypt.compare(password, user.password);
       if (isUser) return cb(null, {
