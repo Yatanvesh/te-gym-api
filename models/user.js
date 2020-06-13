@@ -4,7 +4,6 @@ const {isEmail} = require('validator');
 const {hashPassword} = require('../utility/utility');
 const db = require('../config/db');
 
-
 const Model = db.model('User', {
   _id: {
     type: String,
@@ -18,8 +17,8 @@ const Model = db.model('User', {
   email: emailSchema({
     required: true
   }),
-  userData: {type: String, ref: 'UserData', index: true, required: true},
-  userType: {type: String, default: 'USER', enum: ['USER', 'COACH']}
+  userData: {type: String, ref: 'UserData', index: true},
+  userType: {type: String, default: 'USER', enum: ['USER', 'COACH'], required:true}
 })
 
 async function get(email) {

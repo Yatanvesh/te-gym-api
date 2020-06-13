@@ -13,13 +13,15 @@ router.post('/trainer', saveFileToServer.single('file'), async function (req, re
     }
     const trainer = await User.create({
       ...req.body,
+      userType:'COACH'
     });
     if (!(trainer && trainer.email))
       throw new Error("User creation failed");
 
     const trainerData = await UserData.create({
       ...req.body,
-      displayPictureUrl: imageUrl
+      displayPictureUrl: imageUrl,
+      userType:'COACH'
     });
     if (!(trainerData && trainerData.email))
       throw new Error("UserData creation failed");
@@ -48,13 +50,15 @@ router.post('/user', saveFileToServer.single('file'), async function (req, res, 
     }
     const customer = await User.create({
       ...req.body,
+      userType:'USER'
     });
     if (!(customer && customer.email))
       throw new Error("User creation failed");
 
     const customerData = await UserData.create({
       ...req.body,
-      displayPictureUrl: imageUrl
+      displayPictureUrl: imageUrl,
+      userType:'USER'
     });
     if (!(customerData && customerData.email))
       throw new Error("UserData creation failed");

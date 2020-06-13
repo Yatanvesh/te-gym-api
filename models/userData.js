@@ -1,10 +1,9 @@
 const cuid = require('cuid');
 const {isEmail} = require('validator');
 
-const {hashPassword} = require('../utility/utility');
 const db = require('../config/db');
 
-
+``
 const Model = db.model('UserData', {
   _id: {
     type: String,
@@ -13,6 +12,7 @@ const Model = db.model('UserData', {
   email: emailSchema({
     required: true
   }),
+  userType: {type: String, default: 'USER', enum: ['USER', 'COACH']},
   name: {
     type: String,
     required: true
@@ -58,9 +58,10 @@ async function get(email) {
 
 async function list(opts = {}) {
   const {
-    offset = 0, limit = 25
-  } = opts
-  const model = await Model.find({}, {password: 0, _id: 0, __v: 0})
+    offset = 0, limit = 25,userType = ''
+  } = opts;
+  const conditions = !!userType ? {userType}:{};
+  const model = await Model.find(conditions, { _id: 0, __v: 0})
     .sort({
       _id: 1
     })
@@ -76,8 +77,7 @@ async function remove(email) {
 }
 
 async function create(fields) {
-  const model = new Model(fields)
-  await hashPassword(model)
+  const model = new Model(fields);
   await model.save()
   return model;
 }
@@ -87,7 +87,6 @@ async function edit(email, change) {
   Object.keys(change).forEach(key => {
     model[key] = change[key]
   });
-  if (change.password) await hashPassword(model);
   await model.save();
   return model;
 }
