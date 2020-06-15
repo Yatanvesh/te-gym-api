@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Posts = require('../models/post');
+
 const utility = require('../utility/utility');
 const {saveFileToServer} = require('../config/uploadConfig');
 
@@ -38,7 +39,7 @@ router.post('/', saveFileToServer.single('image'), async function (req, res, nex
         {
           ...req.body,
           email: user,
-          postType:'TEXT'
+          postType: 'TEXT'
         });
     }
 
@@ -52,6 +53,23 @@ router.post('/', saveFileToServer.single('image'), async function (req, res, nex
       err: err.message
     });
   }
-})
+});
+
+router.delete('/:postId', async function (req, res, next) {
+  try {
+    const {user} = req;
+    const {postId} = req.params;
+
+    const result = await Posts.remove(postId, user);
+    if (result)
+      res.json({
+        success: true
+      });
+  } catch (err) {
+    res.status(500).json({
+      err: err.message
+    });
+  }
+});
 
 module.exports = router;

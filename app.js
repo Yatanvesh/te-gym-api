@@ -10,6 +10,7 @@ const registerRouter = require('./routes/register');
 const trainerRouter = require('./routes/trainers');
 const userRouter = require('./routes/user');
 const postsRouter = require('./routes/posts');
+const commentRouter = require('./routes/comment');
 
 const middleware = require('./middleware');
 const auth = require('./auth');
@@ -34,6 +35,7 @@ app.post('/login', auth.authenticate, auth.login);
 app.use('/trainers', auth.ensureUser, trainerRouter);
 app.use('/user', auth.ensureUser, userRouter);
 app.use('/posts', auth.ensureUser, postsRouter);
+app.use('/comment', auth.ensureUser, commentRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
