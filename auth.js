@@ -96,5 +96,6 @@ module.exports = {
   authenticate,
   login,
   ensureUser,
-  checkJWTValidity
+  checkJWTValidity,
+  sign
 }

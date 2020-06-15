@@ -14,7 +14,7 @@ const Model = db.model('UserData', {
   userType: {type: String, default: 'USER', enum: ['USER', 'COACH']},
   name: {
     type: String,
-    required: true
+    // required: true
   },
   experience:{
     type:Number
