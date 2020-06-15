@@ -17,31 +17,30 @@ router.get('/:email', async function (req, res, next) {
 
 });
 
-router.post('/', async function (req, res, next) {
+router.put('/', async function (req, res, next) {
   try {
     console.log(`User ${req.user} update request`);
     const {user} = req;
     const userData = await UserData.edit(
       user,
       {
-      ...req.body
-    });
-    if(userData){
+        ...req.body
+      });
+    if (userData) {
       res.json({success: true, userData});
-    }
-    else throw new Error("Could not update user data");
+    } else throw new Error("Could not update user data");
   } catch (error) {
     res.status(500).json({error: error.toLocaleString()});
   }
 });
 
-router.post('/displayImage', saveFileToServer.single('image'), async function (req, res, next) {
+router.put('/displayImage', saveFileToServer.single('image'), async function (req, res, next) {
   try {
     let imageUrl = '';
     if (req.file && req.file.path) {
       imageUrl = await utility.uploadLocalFile(req.file.path);
     }
-    if(!imageUrl)
+    if (!imageUrl)
       throw new Error("Image upload failed");
     const {user} = req;
 
@@ -54,8 +53,7 @@ router.post('/displayImage', saveFileToServer.single('image'), async function (r
       throw new Error("display image updation failed");
 
     res.json({imageUrl, success: true});
-  } catch
-    (err) {
+  } catch (err) {
     res.status(500).json({
       err: err.message
     });
