@@ -10,14 +10,15 @@ const jwtSecret = process.env.JWT_SECRET || 'mark it zero'
 const adminPassword = process.env.ADMIN_PASSWORD || 'iamthewalrus'
 const jwtOpts = {
   algorithm: 'HS256',
-  expiresIn: '30d'
+  // expiresIn: '30d'
 }
 
 passport.use(adminStrategy());
 
 const login = async (req, res) => {
   const token = await sign({
-    username: req.username
+    username: req.user.username,
+    userType:req.user.userType
   });
   res.json({
     success: true,
@@ -34,7 +35,8 @@ async function ensureUser(req, res, next) {
     const jwtString = req.headers.authorization;
     const payload = await verify(jwtString);
     if (payload) {
-      req.user = payload;
+      req.user = payload.username;
+      req.userType = payload.userType;
       return next()
     }
 
@@ -66,10 +68,14 @@ function adminStrategy() {
       let user = await Users.get(username);
       if (!user) return cb(null, false);
       const isUser = await bcrypt.compare(password, user.password);
-      if (isUser) return cb(null, {
-        username: user.username
-      })
+      if (isUser){
+        return cb(null, {
+          username: user.email,
+          userType: user.userType
+        })
+      }
     } catch (err) {
+      console.log('error in authentication')
     }
     cb(null, false)
   })
@@ -84,7 +90,6 @@ async function verify(jwtString = '') {
   jwtString = jwtString.replace(/^Bearer /i, '')
   try {
     const payload = await jwt.verify(jwtString, jwtSecret);
-    console.log(payload)
     return payload;
   } catch (err) {
     err.statusCode = 401
