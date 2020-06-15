@@ -18,21 +18,23 @@ const Model = db.model('User', {
     required: true
   }),
   userData: {type: String, ref: 'UserData', index: true}, // maybe reqd, maybe not. Lets keep this here for now
-  userType: {type: String, default: 'USER', enum: ['USER', 'COACH'], required:true}
+  userType: {type: String, default: 'USER', enum: ['USER', 'COACH'], required: true}
 })
 
 async function get(email) {
-  const model = await Model.findOne({
-    email
-  });
+  const model = await Model.findOne(
+    {email},
+    {_id: 0, __v: 0}
+  );
   return model;
 }
+
 
 async function list(opts = {}) {
   const {
     offset = 0, limit = 25, userType = ''
   } = opts
-  const conditions = !!userType ? {userType}:{};
+  const conditions = !!userType ? {userType} : {};
   const model = await Model.find(conditions, {password: 0, _id: 0, __v: 0})
     .sort({
       _id: 1

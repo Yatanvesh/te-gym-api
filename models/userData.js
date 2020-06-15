@@ -16,17 +16,17 @@ const Model = db.model('UserData', {
     type: String,
     // required: true
   },
-  experience:{
-    type:Number
+  experience: {
+    type: Number
   },
-  chargePerSession:{
-    type:Number
+  chargePerSession: {
+    type: Number
   },
   phone: {
     type: String
   },
-  gender:{
-    type:String
+  gender: {
+    type: String
   },
   displayPictureUrl: {
     type: String
@@ -37,30 +37,38 @@ const Model = db.model('UserData', {
   weight: {
     type: Number
   },
-  height:{
-    type:Number
+  height: {
+    type: Number
   },
   chest: {
     type: Number
   },
-  biceps:{
-    type:Number
+  biceps: {
+    type: Number
   },
 })
 
 async function get(email) {
-  const model = await Model.findOne({
-    email
-  });
+  const model = await Model.findOne(
+    {email},
+  );
+  return model;
+}
+
+async function getPublic(email) {
+  const model = await Model.findOne(
+    {email},
+    {_id: 0, __v: 0}
+  );
   return model;
 }
 
 async function list(opts = {}) {
   const {
-    offset = 0, limit = 25,userType = ''
+    offset = 0, limit = 25, userType = ''
   } = opts;
-  const conditions = !!userType ? {userType}:{};
-  const model = await Model.find(conditions, { _id: 0, __v: 0})
+  const conditions = !!userType ? {userType} : {};
+  const model = await Model.find(conditions, {_id: 0, __v: 0})
     .sort({
       _id: 1
     })
@@ -87,7 +95,7 @@ async function edit(email, change) {
     model[key] = change[key]
   });
   await model.save();
-  return model;
+  return await getPublic(email);
 }
 
 
@@ -120,7 +128,7 @@ async function isUnique(doc, property) {
 }
 
 module.exports = {
-  get,
+  get:getPublic,
   list,
   create,
   edit,

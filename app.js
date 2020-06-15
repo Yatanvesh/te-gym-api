@@ -1,17 +1,14 @@
 const createError = require('http-errors');
 const express = require('express');
 var cors = require('cors');
-// const bodyParser = require('body-parser');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-// const multer = require('multer');
-
-// const upload = multer();
 
 const indexRouter = require('./routes/index');
 const registerRouter = require('./routes/register');
 const trainerRouter = require('./routes/trainers');
+const userRouter = require('./routes/user');
 
 const middleware = require('./middleware');
 const auth = require('./auth');
@@ -34,7 +31,7 @@ app.get('/testAuthorization', auth.checkJWTValidity);
 app.use('/register', registerRouter);
 app.post('/login', auth.authenticate, auth.login);
 app.use('/trainers', auth.ensureUser, trainerRouter);
-
+app.use('/user', auth.ensureUser, userRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
