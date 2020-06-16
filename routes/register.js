@@ -5,7 +5,7 @@ const signJwt = require('../auth').sign;
 const TrainerData = require('../models/trainerData');
 const UserData = require('../models/userData');
 const User = require('../models/user');
-const Slot = require('../models/slot');
+const Package = require('../models/package');
 
 const {userTypes} =  require("../constants")
 
@@ -23,12 +23,12 @@ const createUser = async (email, password, userType) => {
     throw new Error("user data creation failed");
 
   if(userType===userTypes.TRAINER){
-    // Create a default slot and add it
-    const slot = await Slot.create();
-    if (!slot) throw new Error("Error in creating slot");
-    //
-    const trainer = await TrainerData.addSlot(user, slot._id);
-    // if(!trainer) throw new Error("Error in adding default slot");
+    // Create a default package and add it
+    const package_ = await Package.create();
+    if (!package_) throw new Error("Error in creating package");
+
+    const trainer = await TrainerData.addPackage(email, package_._id);
+    if(!trainer) throw new Error("Error in adding default package");
   }
 
   return user;

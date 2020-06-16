@@ -5,6 +5,8 @@ const {isEmail} = require('validator');
 const db = require('../config/db');
 const {userTypes} = require("../constants")
 
+const Package = require('./package');
+
 const opts = {toJSON: {virtuals: true}};
 
 const trainerSchema = mongoose.Schema({
@@ -27,10 +29,9 @@ const trainerSchema = mongoose.Schema({
     type: Number,
     default: 4.0
   },
-  slots: [{type: String, ref: 'Slot', index: true}],
-  chargePerSession: {
-    type: Number
-  },
+  slots: [{type: String, ref: 'Slot'}],
+  packages: [{type: String, ref: 'Package'}],
+
   phone: {
     type: String
   },
@@ -76,17 +77,10 @@ const Model = db.model('TrainerData', trainerSchema);
 async function get(email) {
   const model = await Model.findOne(
     {email},
-  );
-  return model;
-}
-
-async function getPublic(email) {
-  const model = await Model.findOne(
-    {email},
-    {__v: 0}
   )
-    .populate('slots')
+    .populate('packages')
     .exec();
+
   return model;
 }
 
@@ -101,7 +95,7 @@ async function list(opts = {}) {
     })
     .skip(offset)
     .limit(limit)
-    .populate('slots')
+    .populate('packages')
     .exec();
   return model;
 }
@@ -127,9 +121,20 @@ async function edit(email, change) {
   return await getPublic(email);
 }
 
-async function addSlot(email, slotId) {
+async function addPackage(email, packageId) {
   const model = await get(email);
-  model.slots.push(slotId);
+  model.packages.push(packageId);
+  await model.save();
+  return model;
+}
+
+async function removePackage(email, packageId) {
+  const model = await get(email);
+  console.log("before filter",packageId,model);
+
+  model.packages = model.packages.filter(package_ => package_._id !== packageId);
+  console.log("after filter",model);``
+  await Package.remove(packageId);
   await model.save();
   return model;
 }
@@ -163,11 +168,12 @@ async function isUnique(doc, property) {
 }
 
 module.exports = {
-  get: getPublic,
+  get,
   list,
   create,
   edit,
   remove,
-  addSlot,
+  addPackage,
+  removePackage,
   model: Model
 }
