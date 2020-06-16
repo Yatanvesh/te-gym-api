@@ -18,10 +18,10 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-router.get('/:trainerId', async function (req, res, next) {
+router.get('/:trainerEmail', async function (req, res, next) {
   try {
-    const {trainerId} = req.params;
-    let trainer = await TrainerData.getById(trainerId);
+    const {trainerEmail} = req.params;
+    let trainer = await TrainerData.get(trainerEmail);
 
     res.json({trainer});
   } catch (err) {
