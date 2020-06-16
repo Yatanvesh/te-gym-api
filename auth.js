@@ -18,7 +18,7 @@ passport.use(adminStrategy());
 const login = async (req, res) => {
   const token = await sign({
     username: req.user.username,
-    userType:req.user.userType
+    userType: req.user.userType
   });
   res.json({
     success: true,

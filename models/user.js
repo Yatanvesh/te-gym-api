@@ -1,8 +1,11 @@
+
 const cuid = require('cuid');
 const {isEmail} = require('validator');
 
 const {hashPassword} = require('../utility/utility');
 const db = require('../config/db');
+
+const {userTypes} =  require("../constants")
 
 const Model = db.model('User', {
   _id: {
@@ -17,8 +20,8 @@ const Model = db.model('User', {
   email: emailSchema({
     required: true
   }),
-  userData: {type: String, ref: 'UserData', index: true}, // maybe reqd, maybe not. Lets keep this here for now
-  userType: {type: String, default: 'USER', enum: ['USER', 'COACH'], required: true}
+  // userData: {type: String, ref: 'UserData', index: true}, // maybe reqd, maybe not. Lets keep this here for now
+  userType: {type: String, default: userTypes.USER, enum: [userTypes.USER, userTypes.TRAINER], required: true}
 })
 
 async function get(email) {

@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 const signJwt = require('../auth').sign;
-
+const TrainerData = require('../models/trainerData');
 const UserData = require('../models/userData');
 const User = require('../models/user');
+
+const {userTypes} =  require("../constants")
 
 const createUser = async (email, password, userType) => {
   const user = await User.create({
@@ -14,20 +16,19 @@ const createUser = async (email, password, userType) => {
   });
   if (!(user && user.email))
     throw new Error("User creation failed");
-  const userData = await UserData.create({ // create basic userData object for future updation
-    email,
-    userType
-  });
-  if (!(userData && userData.email))
-    throw new Error("UserData creation failed");
+
+  const data = userType===userTypes.TRAINER? await TrainerData.create({email}): await UserData.create({email});
+  if (!(data && data.email))
+    throw new Error("user data creation failed");
+
   return user;
 }
 
 router.post('/trainer', async function (req, res, next) {
   try {
     const {email, password} = req.body;
-    await createUser(email, password, 'COACH'); // auto handles error
-    const jwt = await signJwt({username: email});
+    await createUser(email, password, userTypes.TRAINER); // auto handles error
+    const jwt = await signJwt({username: email,userType:userTypes.TRAINER});
     res.json({email, jwt, success: true});
   } catch (err) {
     res.status(500).json({
@@ -39,8 +40,8 @@ router.post('/trainer', async function (req, res, next) {
 router.post('/user', async function (req, res, next) {
   try {
     const {email, password} = req.body;
-    await createUser(email, password, 'USER'); // auto handles error
-    const jwt = await signJwt({username: email});
+    await createUser(email, password, userTypes.USER); // auto handles error
+    const jwt = await signJwt({username: email,userType:userTypes.USER});
     res.json({email, jwt, success: true});
   } catch (err) {
     res.status(500).json({

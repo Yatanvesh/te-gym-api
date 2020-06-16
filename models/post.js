@@ -3,6 +3,7 @@ const {isEmail} = require('validator');
 
 const db = require('../config/db');
 const Comment = require('./comment');
+
 const Model = db.model('Post', {
   _id: {
     type: String,

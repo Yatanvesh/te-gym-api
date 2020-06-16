@@ -1,11 +1,13 @@
-
 const cuid = require('cuid');
+const mongoose = require('mongoose');
 const {isEmail} = require('validator');
 
 const db = require('../config/db');
-const {userTypes} =  require("../constants")
+const {userTypes} = require("../constants")
 
-const Model = db.model('UserData', {
+const opts = {toJSON: {virtuals: true}};
+
+const trainerSchema = mongoose.Schema({
   _id: {
     type: String,
     default: cuid
@@ -13,10 +15,21 @@ const Model = db.model('UserData', {
   email: emailSchema({
     required: true
   }),
-  userType: {type: String, default: userTypes.USER},
+  userType: {type: String, default: userTypes.TRAINER}, // helpful for frontend
   name: {
     type: String,
-    // required: true
+  },
+  experience: {
+    type: Number,
+    default: 0
+  },
+  rating: {
+    type: Number,
+    default: 4.0
+  },
+  slots: [{type: String, ref: 'Slot', index: true}],
+  chargePerSession: {
+    type: Number
   },
   phone: {
     type: String
@@ -41,8 +54,24 @@ const Model = db.model('UserData', {
   },
   biceps: {
     type: Number
-  },
-})
+  }
+}, opts);
+
+trainerSchema.virtual('totalSlots')
+  .get(function () {
+    return this.slots.length
+  });
+
+trainerSchema.virtual('usedSlots')
+  .get(function () {
+    let count = 0;
+    this.slots.forEach(slot => {
+      if (slot.assignedTo) count++;
+    });
+    return count;
+  });
+
+const Model = db.model('TrainerData', trainerSchema);
 
 async function get(email) {
   const model = await Model.findOne(
@@ -55,7 +84,9 @@ async function getPublic(email) {
   const model = await Model.findOne(
     {email},
     {_id: 0, __v: 0}
-  );
+  )
+    .populate('slots')
+    .exec();
   return model;
 }
 
@@ -70,6 +101,8 @@ async function list(opts = {}) {
     })
     .skip(offset)
     .limit(limit)
+    .populate('slots')
+    .exec();
   return model;
 }
 
@@ -94,6 +127,12 @@ async function edit(email, change) {
   return await getPublic(email);
 }
 
+async function addSlot(email, slotId) {
+  const model = await get(email);
+  model.slots.push(slotId);
+  await model.save();
+  return model;
+}
 
 function emailSchema(opts = {}) {
   const {
@@ -124,10 +163,11 @@ async function isUnique(doc, property) {
 }
 
 module.exports = {
-  get:getPublic,
+  get: getPublic,
   list,
   create,
   edit,
   remove,
+  addSlot,
   model: Model
 }
