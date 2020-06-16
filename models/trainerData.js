@@ -20,6 +20,7 @@ const trainerSchema = mongoose.Schema({
   userType: {type: String, default: userTypes.TRAINER}, // helpful for frontend
   name: {
     type: String,
+    default:''
   },
   experience: {
     type: Number,
@@ -39,7 +40,8 @@ const trainerSchema = mongoose.Schema({
     type: String
   },
   displayPictureUrl: {
-    type: String
+    type: String,
+    default:''
   },
   bmi: {
     type: Number
@@ -84,19 +86,44 @@ async function get(email) {
   return model;
 }
 
+async function getById(_id) {
+  const model = await Model.findOne(
+    {_id},
+  )
+    .populate('packages')
+    .exec();
+
+  return model;
+}
+
+// async function list(opts = {}) {
+//   const {
+//     offset = 0, limit = 25, userType = ''
+//   } = opts;
+//   const conditions = !!userType ? {userType} : {};
+//   const model = await Model.find(conditions, {__v: 0})
+//     .sort({
+//       _id: 1
+//     })
+//     .skip(offset)
+//     .limit(limit)
+//     .populate('packages')
+//     .exec();
+//   return model;
+// }
+
 async function list(opts = {}) {
   const {
-    offset = 0, limit = 25, userType = ''
+    offset = 0, limit = 25
   } = opts;
-  const conditions = !!userType ? {userType} : {};
-  const model = await Model.find(conditions, {__v: 0})
+  const model = await Model.find({}, {userType:0,packages:0,__v:0,id:0})
     .sort({
       _id: 1
     })
     .skip(offset)
     .limit(limit)
-    .populate('packages')
-    .exec();
+    // .populate('packages')
+    // .exec();
   return model;
 }
 
@@ -169,6 +196,7 @@ async function isUnique(doc, property) {
 
 module.exports = {
   get,
+  getById,
   list,
   create,
   edit,

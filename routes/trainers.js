@@ -18,6 +18,19 @@ router.get('/', async function (req, res, next) {
   }
 });
 
+router.get('/:trainerId', async function (req, res, next) {
+  try {
+    const {trainerId} = req.params;
+    let trainer = await TrainerData.getById(trainerId);
+
+    res.json({trainer});
+  } catch (err) {
+    res.status(500).json({
+      err: err.message
+    });
+  }
+});
+
 // router.post('/addSlot', async function (req, res, next) {
 //   try {
 //     const {user} = req;

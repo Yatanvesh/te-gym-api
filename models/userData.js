@@ -51,14 +51,6 @@ async function get(email) {
   return model;
 }
 
-async function getPublic(email) {
-  const model = await Model.findOne(
-    {email},
-    {_id: 0, __v: 0}
-  );
-  return model;
-}
-
 async function list(opts = {}) {
   const {
     offset = 0, limit = 25, userType = ''
@@ -91,7 +83,7 @@ async function edit(email, change) {
     model[key] = change[key]
   });
   await model.save();
-  return await getPublic(email);
+  return model;
 }
 
 
@@ -124,7 +116,7 @@ async function isUnique(doc, property) {
 }
 
 module.exports = {
-  get:getPublic,
+  get,
   list,
   create,
   edit,
