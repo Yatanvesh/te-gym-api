@@ -118,7 +118,7 @@ async function edit(email, change) {
     model[key] = change[key]
   });
   await model.save();
-  return await getPublic(email);
+  return model;
 }
 
 async function addPackage(email, packageId) {
@@ -133,7 +133,7 @@ async function removePackage(email, packageId) {
   console.log("before filter",packageId,model);
 
   model.packages = model.packages.filter(package_ => package_._id !== packageId);
-  console.log("after filter",model);``
+  console.log("after filter",model);
   await Package.remove(packageId);
   await model.save();
   return model;
