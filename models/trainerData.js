@@ -59,7 +59,7 @@ const trainerSchema = mongoose.Schema({
 
 trainerSchema.virtual('totalSlots')
   .get(function () {
-    return this.slots.length
+    return this.slots.length;
   });
 
 trainerSchema.virtual('usedSlots')
@@ -83,7 +83,7 @@ async function get(email) {
 async function getPublic(email) {
   const model = await Model.findOne(
     {email},
-    {_id: 0, __v: 0}
+    {__v: 0}
   )
     .populate('slots')
     .exec();
@@ -95,7 +95,7 @@ async function list(opts = {}) {
     offset = 0, limit = 25, userType = ''
   } = opts;
   const conditions = !!userType ? {userType} : {};
-  const model = await Model.find(conditions, {_id: 0, __v: 0})
+  const model = await Model.find(conditions, {__v: 0})
     .sort({
       _id: 1
     })

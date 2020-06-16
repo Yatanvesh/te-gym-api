@@ -8,23 +8,23 @@ const Model = db.model('Slot', {
     type: String,
     default: cuid
   },
-  startTime:{
-    type:Number,
-    required:true
+  startTime: {
+    type: Number,
+    default:55800 // seconds from midnight
   },
-  duration:{
-    type:Number,
+  duration: {
+    type: Number,
     default: 30
   },
-  assignedTo:{
-    type:String,
-    ref:'User',
-    index:true,
-    default:null
+  assignedTo: {
+    type: String,
+    ref: 'User',
+    index: true,
+    default: null
   },
-  days:{
-    type:Array,
-    default: ['MON', 'TUE', 'WED', 'THU', 'FRI','SAT','SUN']
+  days: {
+    type: Array,
+    default: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
   }
 })
 
@@ -38,14 +38,13 @@ async function get(_id) {
 
 async function remove(_id, email) {
   const model = await get(_id);
-  if(!model) throw new Error("Comment not found");
-  if (model.email === email){
+  if (!model) throw new Error("Comment not found");
+  if (model.email === email) {
     await Model.deleteOne({
       _id
     });
     return true;
-  }
-  else throw new Error("Not authorised to delete comment");
+  } else throw new Error("Not authorised to delete comment");
 }
 
 async function create(fields) {
@@ -56,7 +55,7 @@ async function create(fields) {
 
 async function edit(_id, email, commentText) {
   const model = await get(_id);
-  if(!model) throw new Error("Comment not found");
+  if (!model) throw new Error("Comment not found");
   if (model.email !== email) throw new Error("Not authorised to edit comment");
 
   model.commentText = commentText;
