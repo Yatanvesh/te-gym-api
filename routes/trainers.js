@@ -18,30 +18,17 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-router.get('/:trainerEmail', async function (req, res, next) {
+router.post('/slot', async function (req, res, next) {
   try {
-    const {trainerEmail} = req.params;
-    let trainer = await TrainerData.get(trainerEmail);
-
-    res.json({trainer});
-  } catch (err) {
-    res.status(500).json({
-      err: err.message
-    });
-  }
-});
-
-router.post('/addSlot', async function (req, res, next) {
-  try {
-    const {user} = req;
-    const {startTime, duration, startDate,endDate} = req.body;
+    const {userId} = req;
+    const {startTime, duration, startDate, endDate} = req.body;
 
     const slot = await Slot.create({
-      startTime, duration, startDate,endDate
+      startTime, duration, startDate, endDate
     });
     if (!slot) throw new Error("Error in creating slot");
 
-    const trainer = await TrainerData.addSlot(user, slot._id);
+    const trainer = await TrainerData.addSlot(userId, slot._id);
     res.json({trainer});
 
   } catch (err) {
@@ -51,9 +38,45 @@ router.post('/addSlot', async function (req, res, next) {
   }
 });
 
+router.put('/slot/:slotId', async function (req, res, next) {
+  try {
+    const {slotId} = req.params;
+    const {startTime, duration, startDate, endDate, assignedTo} = req.body;
+
+    const slot = await Slot.edit(slotId, {
+      startTime, duration, startDate, endDate, assignedTo
+    });
+    if (!slot) throw new Error("Error in modifying slot");
+
+    res.json({slot, success: true});
+
+  } catch (err) {
+    res.status(500).json({
+      err: err.message
+    });
+  }
+});
+
+router.delete('/slot/:slotId', async function (req, res, next) {
+  try {
+    const {slotId} = req.params;
+    const {userId} = req;
+
+    const trainer = await TrainerData.removeSlot(userId, slotId);
+
+    res.json({success: true});
+
+  } catch (err) {
+    res.status(500).json({
+      err: err.message
+    });
+  }
+});
+
+
 router.post('/package', async function (req, res, next) {
   try {
-    const {user} = req;
+    const {userId} = req;
     const {title, duration, price, description} = req.body;
 
     const package_ = await Package.create({
@@ -61,7 +84,7 @@ router.post('/package', async function (req, res, next) {
     });
     if (!package_) throw new Error("Error in creating package");
 
-    const trainer = await TrainerData.addPackage(user, package_._id);
+    const trainer = await TrainerData.addPackage(userId, package_._id);
     res.json({package_});
   } catch (err) {
     res.status(500).json({
@@ -72,11 +95,10 @@ router.post('/package', async function (req, res, next) {
 
 router.put('/package/:packageId', async function (req, res, next) {
   try {
-    const {user} = req;
     const {packageId} = req.params;
     const {title, duration, price, description} = req.body;
 
-    const package_ = await Package.edit(packageId,{
+    const package_ = await Package.edit(packageId, {
       title, duration, price, description
     });
     if (!package_) throw new Error("Error in editing package");
@@ -91,11 +113,11 @@ router.put('/package/:packageId', async function (req, res, next) {
 
 router.delete('/package/:packageId', async function (req, res, next) {
   try {
-    const {user} = req;
+    const {userId} = req;
     const {packageId} = req.params;
 
-    const trainer = await TrainerData.removePackage(user, packageId);
-    res.json({success:true});
+    const trainer = await TrainerData.removePackage(userId, packageId);
+    res.json({success: true});
   } catch (err) {
     res.status(500).json({
       err: err.message

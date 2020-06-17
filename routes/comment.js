@@ -7,16 +7,16 @@ const Comment = require('../models/comment');
 router.post('/:postId', async function (req, res, next) {
   try {
     const {postId} = req.params;
-    const {user} = req;
+    const {userId} = req;
     const {commentText} = req.body;
     const comment = await Comment.create({
-      email:user,
+      userId,
       commentText
     });
-    if(!comment) throw new Error("Failed to create comment");
+    if (!comment) throw new Error("Failed to create comment");
 
     const post = await Posts.addComment(postId, comment._id);
-    if(!post) throw new Error("Failed to add comment to post");
+    if (!post) throw new Error("Failed to add comment to post");
 
     res.json({comment});
   } catch (err) {
@@ -29,11 +29,11 @@ router.post('/:postId', async function (req, res, next) {
 router.put('/:commentId', async function (req, res, next) {
   try {
     const {commentId} = req.params;
-    const {user} = req;
+    const {userId} = req;
     const {commentText} = req.body;
     const comment = await Comment.edit(
       commentId,
-      user,
+      userId,
       commentText
     );
     if (!comment) throw new Error("Failed to edit comment");
@@ -49,13 +49,13 @@ router.put('/:commentId', async function (req, res, next) {
 router.delete('/:commentId', async function (req, res, next) {
   try {
     const {commentId} = req.params;
-    const {user} = req;
+    const {userId} = req;
     const comment = await Comment.remove(
       commentId,
-      user
+      userId
     );
     if (comment)
-      res.json({success:true});
+      res.json({success: true});
   } catch (err) {
     res.status(500).json({
       err: err.message

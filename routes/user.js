@@ -8,16 +8,16 @@ const UserData = require('../models/userData');
 const User = require('../models/user');
 const {userTypes} =  require("../constants")
 
-router.get('/:email?', async function (req, res, next) {
+router.get('/:userId?', async function (req, res, next) {
   try {
-    let {email} = req.params;
-    if(!email) email = req.user;
+    let {userId} = req.params;
+    if(!userId) userId = req.userId;
 
-    const {userType} = await User.get(email);
+    const {userType} = await User.getById(userId);
     if(!userType) throw new Error('User does not exist');
 
     let model = userType === userTypes.TRAINER? TrainerData: UserData;
-    const user = await model.get(email);
+    const user = await model.getById(userId);
     if (!user) throw new Error('Internal server error. code 45621');
 
     res.json({user});
@@ -28,11 +28,11 @@ router.get('/:email?', async function (req, res, next) {
 
 router.put('/', async function (req, res, next) {
   try {
-    console.log(`User ${req.user} update request`);
-    const {user, userType} = req;
+    console.log(`User ${req.userId} update request`);
+    const {userId, userType} = req;
     let model = userType === userTypes.TRAINER? TrainerData: UserData;
     const userData = await model.edit(
-      user,
+      userId,
       {
         ...req.body
       });
@@ -52,11 +52,11 @@ router.put('/displayImage', saveFileToServer.single('image'), async function (re
     }
     if (!imageUrl)
       throw new Error("Image upload failed");
-    const {user, userType} = req;
+    const {userId, userType} = req;
     let model = userType === userTypes.TRAINER? TrainerData: UserData;
 
     const userData = await model.edit(
-      user,
+      userId,
       {
         displayPictureUrl: imageUrl,
       });

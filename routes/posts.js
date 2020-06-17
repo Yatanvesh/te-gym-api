@@ -20,8 +20,8 @@ router.get('/', async function (req, res, next) {
 
 router.post('/', saveFileToServer.single('image'), async function (req, res, next) {
   try {
-    const {user} = req;
-    console.log(`User ${user} requesting post creation`);
+    const {userId} = req;
+    console.log(`User ${userId} requesting post creation`);
     let imageUrl = '', post;
     if (req.file && req.file.path) {
       imageUrl = await utility.uploadLocalFile(req.file.path);
@@ -30,7 +30,7 @@ router.post('/', saveFileToServer.single('image'), async function (req, res, nex
       post = await Posts.create(
         {
           ...req.body,
-          email: user,
+          userId,
           postImageUrl: imageUrl, // ignored if no image url provided,
           postType: 'IMAGE'
         });
@@ -38,7 +38,7 @@ router.post('/', saveFileToServer.single('image'), async function (req, res, nex
       post = await Posts.create(
         {
           ...req.body,
-          email: user,
+          userId,
           postType: 'TEXT'
         });
     }
@@ -57,10 +57,10 @@ router.post('/', saveFileToServer.single('image'), async function (req, res, nex
 
 router.delete('/:postId', async function (req, res, next) {
   try {
-    const {user} = req;
+    const {userId} = req;
     const {postId} = req.params;
 
-    const result = await Posts.remove(postId, user);
+    const result = await Posts.remove(postId, userId);
     if (result)
       res.json({
         success: true

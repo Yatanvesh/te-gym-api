@@ -51,6 +51,12 @@ async function get(email) {
   );
   return model;
 }
+async function getById(_id) {
+  const model = await Model.findOne(
+    {_id},
+  );
+  return model;
+}
 
 async function list(opts = {}) {
   const {
@@ -78,8 +84,8 @@ async function create(fields) {
   return model;
 }
 
-async function edit(email, change) {
-  const model = await get(email);
+async function edit(userId, change) {
+  const model = await getById(userId);
   Object.keys(change).forEach(key => {
     model[key] = change[key]
   });
@@ -118,6 +124,7 @@ async function isUnique(doc, property) {
 
 module.exports = {
   get,
+  getById,
   list,
   create,
   edit,

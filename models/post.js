@@ -1,5 +1,4 @@
 const cuid = require('cuid');
-const {isEmail} = require('validator');
 
 const db = require('../config/db');
 const Comment = require('./comment');
@@ -9,9 +8,10 @@ const Model = db.model('Post', {
     type: String,
     default: cuid
   },
-  email: emailSchema({
+  userId:{
+    type:String,
     required: true
-  }),
+  },
   postType: {
     type: String,
     default: 'TEXT',
@@ -54,12 +54,12 @@ async function list(opts = {}) {
   return model;
 }
 
-async function remove(_id, email) {
+async function remove(_id, userId) {
   const model = await get(_id);
   if(!model) throw new Error("Post not found");
-  if(model.email!==email) throw new Error("Not authorised to delete Post");
+  if(model.userId!==userId) throw new Error("Not authorised to delete Post");
 
-  model.comments.map(comment=> Comment.remove(comment._id,email)); // Delete associated comments
+  model.comments.map(comment=> Comment.remove(comment._id,userId)); // Delete associated comments
 
   await Model.deleteOne({
     _id
@@ -87,22 +87,6 @@ async function addComment(postId, commentId){
   model.comments.push(commentId);
   await model.save();
   return model;
-}
-
-function emailSchema(opts = {}) {
-  const {
-    required
-  } = opts
-  return {
-    type: String,
-    required: !!required,
-    lowercase: true,
-    validate: [{
-      validator: isEmail,
-      message: props => `${props.value} is not a valid email address`
-    }
-    ]
-  }
 }
 
 module.exports = {

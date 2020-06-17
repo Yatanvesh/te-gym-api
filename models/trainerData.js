@@ -1,4 +1,3 @@
-// const cuid = require('cuid');
 const mongoose = require('mongoose');
 const {isEmail} = require('validator');
 
@@ -6,6 +5,7 @@ const db = require('../config/db');
 const {userTypes} = require("../constants")
 
 const Package = require('./package');
+const Slot = require('./slot');
 
 const opts = {toJSON: {virtuals: true}};
 
@@ -145,8 +145,8 @@ async function create(fields) {
   return model;
 }
 
-async function edit(email, change) {
-  const model = await get(email);
+async function edit(userId, change) {
+  const model = await getById(userId);
   Object.keys(change).forEach(key => {
     model[key] = change[key]
   });
@@ -154,27 +154,32 @@ async function edit(email, change) {
   return model;
 }
 
-async function addPackage(email, packageId) {
-  const model = await get(email);
+async function addPackage(trainerId, packageId) {
+  const model = await getById(trainerId);
   model.packages.push(packageId);
   await model.save();
   return model;
 }
 
-async function addSlot(email, slotId) {
-  const model = await get(email);
+async function addSlot(trainerId, slotId) {
+  const model = await getById(trainerId);
   model.slots.push(slotId);
+  await model.save();
+  return getById(model); // doing this cuz of late updation bug, look into later
+}
+
+async function removePackage(trainerId, packageId) {
+  const model = await getById(trainerId);
+  model.packages = model.packages.filter(package_ => package_._id !== packageId);
+  await Package.remove(packageId);
   await model.save();
   return model;
 }
 
-async function removePackage(email, packageId) {
-  const model = await get(email);
-  console.log("before filter",packageId,model);
-
-  model.packages = model.packages.filter(package_ => package_._id !== packageId);
-  console.log("after filter",model);
-  await Package.remove(packageId);
+async function removeSlot(trainerId, slotId) {
+  const model = await getById(trainerId);
+  model.slots = model.slots.filter(slot => slot._id !== slotId);
+  await Slot.remove(slotId);
   await model.save();
   return model;
 }
@@ -217,5 +222,6 @@ module.exports = {
   addPackage,
   addSlot,
   removePackage,
+  removeSlot,
   model: Model
 }

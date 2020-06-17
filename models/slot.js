@@ -8,8 +8,8 @@ const Model = db.model('Slot', {
     default: cuid
   },
   startTime: {
-    type: Number,
-    default: 900 // military time
+    type: String,
+    default: '900' // military time
   },
   duration: {
     type: Number,

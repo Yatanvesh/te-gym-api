@@ -1,5 +1,4 @@
 const cuid = require('cuid');
-const {isEmail} = require('validator');
 
 const db = require('../config/db');
 
@@ -8,9 +7,10 @@ const Model = db.model('Comment', {
     type: String,
     default: cuid
   },
-  email: emailSchema({
-    required: true
-  }),
+  userId:{
+    type:String,
+    required:true
+  },
   dateCreated: {
     type: Date,
     default: Date.now
@@ -33,10 +33,10 @@ async function get(_id) {
   return model;
 }
 
-async function remove(_id, email) {
+async function remove(_id, userId) {
   const model = await get(_id);
   if(!model) throw new Error("Comment not found");
-  if (model.email === email){
+  if (model.userId === userId){
     await Model.deleteOne({
       _id
     });
@@ -51,33 +51,16 @@ async function create(fields) {
   return model;
 }
 
-async function edit(_id, email, commentText) {
+async function edit(_id, userId, commentText) {
   const model = await get(_id);
   if(!model) throw new Error("Comment not found");
-  if (model.email !== email) throw new Error("Not authorised to edit comment");
+  if (model.userId !== userId) throw new Error("Not authorised to edit comment");
 
   model.commentText = commentText;
   model.isEdited = true;
   // model.dateCreated = Date.now(); // lets look into this later, whether to update date created or include updation time
   await model.save();
   return model;
-}
-
-
-function emailSchema(opts = {}) {
-  const {
-    required
-  } = opts
-  return {
-    type: String,
-    required: !!required,
-    lowercase: true,
-    validate: [{
-      validator: isEmail,
-      message: props => `${props.value} is not a valid email address`
-    }
-    ]
-  }
 }
 
 module.exports = {
