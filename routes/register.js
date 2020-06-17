@@ -17,8 +17,8 @@ const createUser = async (email, password, userType) => {
   });
   if (!(user && user.email))
     throw new Error("User creation failed");
-
-  const data = userType===userTypes.TRAINER? await TrainerData.create({email}): await UserData.create({email});
+const {_id} = user;
+  const data = userType===userTypes.TRAINER? await TrainerData.create({email,_id}): await UserData.create({email,_id});
   if (!(data && data.email))
     throw new Error("user data creation failed");
 

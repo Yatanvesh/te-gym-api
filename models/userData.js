@@ -1,5 +1,5 @@
 
-const cuid = require('cuid');
+// const cuid = require('cuid');
 const {isEmail} = require('validator');
 
 const db = require('../config/db');
@@ -8,7 +8,8 @@ const {userTypes} =  require("../constants")
 const Model = db.model('UserData', {
   _id: {
     type: String,
-    default: cuid
+    required:true,
+    // default: cuid
   },
   email: emailSchema({
     required: true

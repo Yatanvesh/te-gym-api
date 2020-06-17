@@ -1,5 +1,4 @@
 const cuid = require('cuid');
-const {isEmail} = require('validator');
 
 const db = require('../config/db');
 
@@ -10,7 +9,7 @@ const Model = db.model('Slot', {
   },
   startTime: {
     type: Number,
-    default:55800 // seconds from midnight
+    default: 900 // military time
   },
   duration: {
     type: Number,
@@ -22,9 +21,13 @@ const Model = db.model('Slot', {
     index: true,
     default: null
   },
-  days: {
-    type: Array,
-    default: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+  startDate: {
+    type: Date,
+    default: Date.now
+  },
+  endDate: {
+    type: Date,
+    default: Date.now // temporary
   }
 })
 
@@ -36,15 +39,13 @@ async function get(_id) {
   return model;
 }
 
-async function remove(_id, email) {
+async function remove(_id,) {
   const model = await get(_id);
-  if (!model) throw new Error("Comment not found");
-  if (model.email === email) {
-    await Model.deleteOne({
-      _id
-    });
-    return true;
-  } else throw new Error("Not authorised to delete comment");
+  if (!model) throw new Error("Slot not found");
+  await Model.deleteOne({
+    _id
+  });
+  return true;
 }
 
 async function create(fields) {
@@ -53,14 +54,13 @@ async function create(fields) {
   return model;
 }
 
-async function edit(_id, email, commentText) {
+async function edit(_id, change) {
   const model = await get(_id);
   if (!model) throw new Error("Comment not found");
-  if (model.email !== email) throw new Error("Not authorised to edit comment");
 
-  model.commentText = commentText;
-  model.isEdited = true;
-  // model.dateCreated = Date.now(); // lets look into this later, whether to update date created or include updation time
+  Object.keys(change).forEach(key => {
+    model[key] = change[key]
+  });
   await model.save();
   return model;
 }

@@ -31,26 +31,25 @@ router.get('/:trainerEmail', async function (req, res, next) {
   }
 });
 
-// router.post('/addSlot', async function (req, res, next) {
-//   try {
-//     const {user} = req;
-//     const {startTime, duration, days} = req.body;
-//
-//     const slot = await Slot.create({
-//       startTime, duration, days
-//     });
-//     if (!slot) throw new Error("Error in creating slot");
-//
-//     const trainer = await TrainerData.addSlot(user, slot._id);
-//     res.json({trainer});
-//
-//
-//   } catch (err) {
-//     res.status(500).json({
-//       err: err.message
-//     });
-//   }
-// });
+router.post('/addSlot', async function (req, res, next) {
+  try {
+    const {user} = req;
+    const {startTime, duration, startDate,endDate} = req.body;
+
+    const slot = await Slot.create({
+      startTime, duration, startDate,endDate
+    });
+    if (!slot) throw new Error("Error in creating slot");
+
+    const trainer = await TrainerData.addSlot(user, slot._id);
+    res.json({trainer});
+
+  } catch (err) {
+    res.status(500).json({
+      err: err.message
+    });
+  }
+});
 
 router.post('/package', async function (req, res, next) {
   try {

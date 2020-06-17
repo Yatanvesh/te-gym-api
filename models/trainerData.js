@@ -1,4 +1,4 @@
-const cuid = require('cuid');
+// const cuid = require('cuid');
 const mongoose = require('mongoose');
 const {isEmail} = require('validator');
 
@@ -12,7 +12,8 @@ const opts = {toJSON: {virtuals: true}};
 const trainerSchema = mongoose.Schema({
   _id: {
     type: String,
-    default: cuid
+    required:true
+    // default: cuid
   },
   email: emailSchema({
     required: true
@@ -30,9 +31,12 @@ const trainerSchema = mongoose.Schema({
     type: Number,
     default: 4.0
   },
+  workingDays: {
+    type: Array,
+    default: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+  },
   slots: [{type: String, ref: 'Slot'}],
   packages: [{type: String, ref: 'Package'}],
-
   phone: {
     type: String
   },
@@ -81,6 +85,7 @@ async function get(email) {
     {email},
   )
     .populate('packages')
+    .populate('slots')
     .exec();
 
   return model;
@@ -91,6 +96,7 @@ async function getById(_id) {
     {_id},
   )
     .populate('packages')
+    .populate('slots')
     .exec();
 
   return model;
@@ -155,6 +161,13 @@ async function addPackage(email, packageId) {
   return model;
 }
 
+async function addSlot(email, slotId) {
+  const model = await get(email);
+  model.slots.push(slotId);
+  await model.save();
+  return model;
+}
+
 async function removePackage(email, packageId) {
   const model = await get(email);
   console.log("before filter",packageId,model);
@@ -202,6 +215,7 @@ module.exports = {
   edit,
   remove,
   addPackage,
+  addSlot,
   removePackage,
   model: Model
 }
