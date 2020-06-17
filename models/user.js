@@ -1,11 +1,10 @@
-
 const cuid = require('cuid');
 const {isEmail} = require('validator');
 
 const {hashPassword} = require('../utility/utility');
 const db = require('../config/db');
 
-const {userTypes} =  require("../constants")
+const {userTypes} = require("../constants")
 
 const Model = db.model('User', {
   _id: {
@@ -27,7 +26,7 @@ const Model = db.model('User', {
 async function get(email) {
   const model = await Model.findOne(
     {email},
-    {_id: 0, __v: 0}
+    {__v: 0}
   );
   return model;
 }

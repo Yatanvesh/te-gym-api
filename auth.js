@@ -17,8 +17,9 @@ passport.use(adminStrategy());
 
 const login = async (req, res) => {
   const token = await sign({
-    username: req.user.username,
-    userType: req.user.userType
+    userEmail: req.user.userEmail,
+    userType: req.user.userType,
+    userId: req.user.userId
   });
   res.json({
     success: true,
@@ -37,8 +38,9 @@ async function ensureUser(req, res, next) {
     const payload = await verify(jwtString);
 
     if (payload) {
-      req.user = payload.username;
+      req.userEmail = payload.userEmail;
       req.userType = payload.userType;
+      req.userId = payload.userId;
       return next()
     }
 
@@ -65,15 +67,16 @@ async function checkJWTValidity(req, res, next) {
 }
 
 function adminStrategy() {
-  return new Strategy(async function (username, password, cb) {
+  return new Strategy(async function (email, password, cb) {
     try {
-      let user = await Users.get(username);
+      let user = await Users.get(email);
       if (!user) return cb(null, false);
       const isUser = await bcrypt.compare(password, user.password);
-      if (isUser){
+      if (isUser) {
         return cb(null, {
-          username: user.email,
-          userType: user.userType
+          userEmail: user.email,
+          userType: user.userType,
+          userId: user._id
         })
       }
     } catch (err) {
