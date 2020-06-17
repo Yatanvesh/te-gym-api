@@ -31,9 +31,11 @@ const authenticate = passport.authenticate('local', {
 });
 
 async function ensureUser(req, res, next) {
+
   try {
     const jwtString = req.headers.authorization;
     const payload = await verify(jwtString);
+
     if (payload) {
       req.user = payload.username;
       req.userType = payload.userType;
