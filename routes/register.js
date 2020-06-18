@@ -40,9 +40,9 @@ const createUser = async (email, password, userType) => {
 router.post('/trainer', async function (req, res, next) {
   try {
     const {email, password} = req.body;
-    const {userId} = await createUser(email, password, userTypes.TRAINER); // auto handles error
-    const jwt = await signJwt({userEmail: email, userType: userTypes.TRAINER, userId});
-    res.json({email, userId, jwt, success: true});
+    const {_id} = await createUser(email, password, userTypes.TRAINER); // auto handles error
+    const jwt = await signJwt({userEmail: email, userType: userTypes.TRAINER, userId:_id});
+    res.json({email, userId:_id, jwt, success: true});
   } catch (err) {
     res.status(500).json({
       err: err.message
@@ -53,9 +53,9 @@ router.post('/trainer', async function (req, res, next) {
 router.post('/user', async function (req, res, next) {
   try {
     const {email, password} = req.body;
-    const {userId} = await createUser(email, password, userTypes.USER); // auto handles error
-    const jwt = await signJwt({userEmail: email, userType: userTypes.USER, userId});
-    res.json({email, userId, jwt, success: true});
+    const {_id} = await createUser(email, password, userTypes.USER); // auto handles error
+    const jwt = await signJwt({userEmail: email, userType: userTypes.USER, userId:_id});
+    res.json({email, userId:_id, jwt, success: true});
   } catch (err) {
     res.status(500).json({
       err: err.message
