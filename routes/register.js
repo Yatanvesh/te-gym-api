@@ -28,8 +28,9 @@ const createUser = async (email, password, userType) => {
     // Create a default package and add it
     const package_ = await Package.create();
     if (!package_) throw new Error("Error in creating package");
+    console.log(package_)
 
-    const trainer = await TrainerData.addPackage(email, package_._id);
+    const trainer = await TrainerData.addPackage(_id, package_._id);
     if (!trainer) throw new Error("Error in adding default package");
   }
 
