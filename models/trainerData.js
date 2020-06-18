@@ -69,8 +69,10 @@ trainerSchema.virtual('totalSlots')
     return this.slots.length;
   });
 
+//defective method
 trainerSchema.virtual('usedSlots')
   .get(function () {
+    return this.slots.length;
     let count = 0;
     this.slots.forEach(slot => {
       if (slot.assignedTo) count++;
