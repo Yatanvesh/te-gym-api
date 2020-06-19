@@ -18,9 +18,10 @@ const middleware = require('./middleware');
 const auth = require('./auth');
 
 const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
-
+// const server = require('http').Server(app);
+// const socket_io = require('socket.io');
+// const io = socket_io();
+// app.io = io;
 app.use(cors());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -41,11 +42,11 @@ app.use('/trainers', auth.ensureUser, trainerRouter);
 app.use('/user', auth.ensureUser, userRouter);
 app.use('/posts', auth.ensureUser, postsRouter);
 app.use('/comment', auth.ensureUser, commentRouter);
-io.on('connection', onConnection);
+// io.on('connection', onConnection);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
 app.use(middleware.handleError);
 
-module.exports = server;
+module.exports = app;

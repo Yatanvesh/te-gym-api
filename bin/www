@@ -4,9 +4,16 @@
  * Module dependencies.
  */
 
-var server = require('../app');
+var app = require('../app');
 var debug = require('debug')('te-gym-api:server');
-// var http = require('http');
+var http = require('http');
+
+var server = http.createServer(app);
+
+var socketApi = require('../socketAPI');
+var io = socketApi.io;
+io.attach(server);
+
 
 /**
  * Get port from environment and store in Express.
