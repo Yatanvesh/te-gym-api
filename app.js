@@ -12,10 +12,15 @@ const userRouter = require('./routes/user');
 const postsRouter = require('./routes/posts');
 const commentRouter = require('./routes/comment');
 
+const {onConnection} = require('./routes/socket');
+
 const middleware = require('./middleware');
 const auth = require('./auth');
 
 const app = express();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+
 app.use(cors());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -36,10 +41,11 @@ app.use('/trainers', auth.ensureUser, trainerRouter);
 app.use('/user', auth.ensureUser, userRouter);
 app.use('/posts', auth.ensureUser, postsRouter);
 app.use('/comment', auth.ensureUser, commentRouter);
+io.on('connection', onConnection);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
 app.use(middleware.handleError);
 
-module.exports = app;
+module.exports = server;
