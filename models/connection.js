@@ -35,6 +35,7 @@ async function create(fields) {
   let model = await get(userId);
   if (model) {
     model.socketId = socketId;
+    model.creationTime = Date.now();
   } else {
     model = new Model({
       _id: userId,

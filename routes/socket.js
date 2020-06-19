@@ -24,7 +24,11 @@ const onConnection = (socket, io) => {
     const {userId} = data;
     console.log("check req for ", userId);
     const connection = await ConnectionModel.get(userId);
-    if (connection) {
+    const {creationTime} = connection;
+    let time = Date.now();
+    let connectionCreationTime = new Date(creationTime);
+    console.log(time - connectionCreationTime);
+    if(time-connectionCreationTime<30000){
       socket.emit(CHANNELS.CHECK_USER_ONLINE, true);
     } else {
       socket.emit(CHANNELS.CHECK_USER_ONLINE, false);
@@ -34,7 +38,7 @@ const onConnection = (socket, io) => {
   socket.on(CHANNELS.INITIATE_VIDEO_CALL, async (data) => {
     const {userId} = data;
     console.log("Video call req for ", userId);
-    const sessionID =  'test'//cuid();
+    const sessionID =  cuid();
     const connection = await ConnectionModel.get(userId);
     if (connection) {
       socket.emit(CHANNELS.INITIATE_VIDEO_CALL, {sessionID});
