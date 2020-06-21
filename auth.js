@@ -16,14 +16,18 @@ const jwtOpts = {
 passport.use(adminStrategy());
 
 const login = async (req, res) => {
-  const token = await sign({
-    userEmail: req.user.userEmail,
-    userType: req.user.userType,
-    userId: req.user.userId
+  const {userEmail,userType,userId} = req.user;
+  const authToken = await sign({
+    userEmail,
+    userType,
+    userId
   });
   res.json({
     success: true,
-    token: token
+    authToken,
+    userType,
+    email:userEmail,
+    userId
   })
 }
 
@@ -72,6 +76,7 @@ function adminStrategy() {
       let user = await Users.get(email);
       if (!user) return cb(null, false);
       const isUser = await bcrypt.compare(password, user.password);
+      console.log(isUser)
       if (isUser) {
         return cb(null, {
           userEmail: user.email,

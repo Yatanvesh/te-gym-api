@@ -1,5 +1,14 @@
 const express = require('express');
+const admin = require("firebase-admin");
+const serviceAccount = require("../config/serviceAccountKey.json");
+
 const router = express.Router();
+const {firebaseDatabaseUrl} = require('../config');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: firebaseDatabaseUrl
+});
 
 const signJwt = require('../auth').sign;
 const TrainerData = require('../models/trainerData');
@@ -28,8 +37,6 @@ const createUser = async (email, password, userType) => {
     // Create a default package and add it
     const package_ = await Package.create();
     if (!package_) throw new Error("Error in creating package");
-    console.log(package_)
-
     const trainer = await TrainerData.addPackage(_id, package_._id);
     if (!trainer) throw new Error("Error in adding default package");
   }
@@ -41,8 +48,8 @@ router.post('/trainer', async function (req, res, next) {
   try {
     const {email, password} = req.body;
     const {_id} = await createUser(email, password, userTypes.TRAINER); // auto handles error
-    const jwt = await signJwt({userEmail: email, userType: userTypes.TRAINER, userId:_id});
-    res.json({email, userId:_id, jwt, success: true});
+    const authToken = await signJwt({userEmail: email, userType: userTypes.TRAINER, userId: _id});
+    res.json({email, userId: _id, authToken,userType:userTypes.TRAINER, success: true});
   } catch (err) {
     res.status(500).json({
       err: err.message
@@ -54,13 +61,36 @@ router.post('/user', async function (req, res, next) {
   try {
     const {email, password} = req.body;
     const {_id} = await createUser(email, password, userTypes.USER); // auto handles error
-    const jwt = await signJwt({userEmail: email, userType: userTypes.USER, userId:_id});
-    res.json({email, userId:_id, jwt, success: true});
+    const authToken = await signJwt({userEmail: email, userType: userTypes.USER, userId: _id});
+    res.json({email, userId: _id, authToken, userType:userTypes.User, success: true});
   } catch (err) {
     res.status(500).json({
       err: err.message
     });
   }
 });
+
+router.post('/user/googleAuth', async function (req, res, next) {
+  try {
+    const {idToken} = req.body;
+    const {name, picture, user_id, email}   = await admin.auth().verifyIdToken(idToken);
+    const user = await UserData.create({
+      email,
+      _id: user_id,
+      displayPictureUrl: picture,
+      name
+    })
+    if (!user) throw new Error("Unable to create user");
+
+    const authToken = await signJwt({userEmail: email, userType: userTypes.USER, userId: user_id});
+    res.json({email, userId: user_id, authToken, userType:userTypes.USER, success: true});
+  } catch (err) {
+    console.log(err);
+    res.status(403).json({
+      err: err.message
+    });
+  }
+});
+
 
 module.exports = router;

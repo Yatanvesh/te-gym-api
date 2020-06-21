@@ -79,6 +79,11 @@ async function remove(email) {
 }
 
 async function create(fields) {
+  if(fields._id){
+    const model = await getById(fields._id);
+    if(model)
+      return model; // Can later be changed to update and return
+  }
   const model = new Model(fields);
   await model.save()
   return model;
