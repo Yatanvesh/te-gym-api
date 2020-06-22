@@ -2,16 +2,22 @@ const express = require('express');
 const router = express.Router();
 
 const TrainerData = require('../models/trainerData');
+const UserData = require('../models/userData');
 const Slot = require('../models/slot');
 const Package = require('../models/package');
 const {userTypes} = require("../constants")
 
 router.get('/', async function (req, res, next) {
   try {
-    let trainers = await TrainerData.list({userType: userTypes.TRAINER});
+    const {userType} = req;
+    let users;
+    if(userType===userTypes.USER)
+     users = await TrainerData.list();
+    else users = await UserData.list()
 
-    res.json({trainers});
+    res.json({trainers:users});
   } catch (err) {
+    console.log(err)
     res.status(500).json({
       err: err.message
     });

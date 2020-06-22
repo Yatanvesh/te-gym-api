@@ -12,7 +12,7 @@ const opts = {toJSON: {virtuals: true}};
 const trainerSchema = mongoose.Schema({
   _id: {
     type: String,
-    required:true
+    required: true
     // default: cuid
   },
   email: emailSchema({
@@ -21,7 +21,7 @@ const trainerSchema = mongoose.Schema({
   userType: {type: String, default: userTypes.TRAINER}, // helpful for frontend
   name: {
     type: String,
-    default:''
+    default: ''
   },
   experience: {
     type: Number,
@@ -45,7 +45,7 @@ const trainerSchema = mongoose.Schema({
   },
   displayPictureUrl: {
     type: String,
-    default:''
+    default: ''
   },
   bmi: {
     type: Number
@@ -124,14 +124,14 @@ async function list(opts = {}) {
   const {
     offset = 0, limit = 25
   } = opts;
-  const model = await Model.find({}, {userType:0,packages:0,__v:0,id:0})
+  const model = await Model.find({}, {packages: 0, __v: 0, id: 0})
     .sort({
       _id: 1
     })
     .skip(offset)
     .limit(limit)
-    // .populate('packages')
-    // .exec();
+  // .populate('packages')
+  // .exec();
   return model;
 }
 
@@ -142,6 +142,11 @@ async function remove(email) {
 }
 
 async function create(fields) {
+  if (fields._id) {
+    const model = await getById(fields._id);
+    if (model)
+      return model; // Can later be changed to update and return
+  }
   const model = new Model(fields);
   await model.save()
   return model;

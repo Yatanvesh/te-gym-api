@@ -13,16 +13,19 @@ router.get('/:userId?', async function (req, res, next) {
     let {userId} = req.params;
     if(!userId) userId = req.userId;
 
-    const {userType} = await User.getById(userId);
-    if(!userType) throw new Error('User does not exist');
+    // const {userType} = await User.getById(userId);
+    // if(!userType) throw new Error('User does not exist');
+    let user = await TrainerData.getById(userId);
+    if(!user) user = await UserData.getById(userId);
 
-    let model = userType === userTypes.TRAINER? TrainerData: UserData;
-    const user = await model.getById(userId);
+    // let model = userType === userTypes.TRAINER? TrainerData: UserData;
+    // const user = await model.getById(userId);
     if (!user) throw new Error('Internal server error. code 45621');
 
     res.json({user});
   } catch (error) {
     res.status(500).json({error: error.toLocaleString()});
+    console.log(error)
   }
 });
 

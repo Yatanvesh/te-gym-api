@@ -11,8 +11,9 @@ const trainerRouter = require('./routes/trainers');
 const userRouter = require('./routes/user');
 const postsRouter = require('./routes/posts');
 const commentRouter = require('./routes/comment');
+const callRouter = require('./routes/call');
 
-const {onConnection} = require('./routes/socket');
+// const {onConnection} = require('./routes/socket');
 
 const middleware = require('./middleware');
 const auth = require('./auth');
@@ -42,6 +43,7 @@ app.use('/trainers', auth.ensureUser, trainerRouter);
 app.use('/user', auth.ensureUser, userRouter);
 app.use('/posts', auth.ensureUser, postsRouter);
 app.use('/comment', auth.ensureUser, commentRouter);
+app.use('/call', auth.ensureUser,callRouter);
 // io.on('connection', onConnection);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -49,4 +51,19 @@ app.use(function (req, res, next) {
 });
 app.use(middleware.handleError);
 
+// admin.messaging().sendToDevice(
+//   ['dZe1F-nmTbqxzJ9w6DyfTM:APA91bE1Zh_f8f4PMBkPryzLK6HzkONOk29vog5nfHWC4W-6cULvxoQ8hlSmD2sMTx4zzDCP8VZPwpBK_5BEDXsgVx2eS6ttACF_4kPwUAqL5TkECEeKdafe_bcwNkoObsJkUi65pe58'],
+//   {
+//     data: {
+//       "priority": "high",
+//       "uuid": "uuid of user",
+//       "name": "RNVoip",
+//       "type": "call"
+//     }
+//   },
+//   {
+//     contentAvailable: true,
+//     priority: 'high'
+//   },
+// );
 module.exports = app;

@@ -60,10 +60,9 @@ async function getById(_id) {
 
 async function list(opts = {}) {
   const {
-    offset = 0, limit = 25, userType = ''
+    offset = 0, limit = 25
   } = opts;
-  const conditions = !!userType ? {userType} : {};
-  const model = await Model.find(conditions, {_id: 0, __v: 0})
+  const model = await Model.find({}, {__v: 0})
     .sort({
       _id: 1
     })
@@ -79,9 +78,9 @@ async function remove(email) {
 }
 
 async function create(fields) {
-  if(fields._id){
+  if (fields._id) {
     const model = await getById(fields._id);
-    if(model)
+    if (model)
       return model; // Can later be changed to update and return
   }
   const model = new Model(fields);

@@ -10,9 +10,9 @@ var http = require('http');
 
 var server = http.createServer(app);
 
-var socketApi = require('../socketAPI');
-var io = socketApi.io;
-io.attach(server);
+// var socketApi = require('../socketAPI');
+// var io = socketApi.io;
+// io.attach(server);
 
 
 /**

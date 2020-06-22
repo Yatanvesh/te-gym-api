@@ -8,7 +8,10 @@ const CHANNELS = {
   INITIATE_VIDEO_CALL:'INITIATE_VIDEO_CALL',
   CONFIRM_VIDEO_CALL:'CONFIRM_VIDEO_CALL'
 }
+
+const agoraAppId = 'de359ae21a884e08a18e38476b54ccea';
 module.exports = {
   userTypes,
-  CHANNELS
+  CHANNELS,
+  agoraAppId
 }
