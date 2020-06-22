@@ -10,7 +10,7 @@ const {agoraAppId} = require('../constants');
 router.get('/:targetUserId', async function (req, res, next) {
   try {
     const {targetUserId} = req.params;
-    const {userId} = req;
+    const {userEmail} = req;
     const sessionId = cuid();
 
     const fcmToken = await Fcm.getToken(targetUserId);
@@ -22,7 +22,8 @@ router.get('/:targetUserId', async function (req, res, next) {
           "priority": "high",
           "sessionId": sessionId,
           "agoraAppId": agoraAppId,
-          "type": "call"
+          "type": "call",
+          "userEmail":userEmail
         }
       },
       {
