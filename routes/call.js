@@ -1,7 +1,9 @@
 const express = require('express');
 const cuid = require('cuid');
 const {admin} = require('../config');
-
+const {userTypes} = require("../constants")
+const TrainerData = require('../models/trainerData');
+const UserData = require('../models/userData');
 const router = express.Router();
 
 const Fcm = require('../models/fcm');
@@ -10,11 +12,17 @@ const {agoraAppId} = require('../constants');
 router.get('/:targetUserId', async function (req, res, next) {
   try {
     const {targetUserId} = req.params;
-    const {userEmail} = req;
+    const {userId, userType} = req;
     const sessionId = cuid();
 
     const fcmToken = await Fcm.getToken(targetUserId);
+    let userData = {};
+    if(userType===userTypes.TRAINER){
+      userData = await TrainerData.getById(userId);
+    }else userData = await UserData.getById(userId);
 
+
+    const {name,displayPictureUrl} = userData;
     await admin.messaging().sendToDevice(
       [fcmToken],
       {
@@ -23,7 +31,8 @@ router.get('/:targetUserId', async function (req, res, next) {
           "sessionId": sessionId,
           "agoraAppId": agoraAppId,
           "type": "call",
-          "userEmail":userEmail
+          "dpUrl":displayPictureUrl,
+          "displayName":name
         }
       },
       {
